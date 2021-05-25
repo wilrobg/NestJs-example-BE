@@ -1,4 +1,4 @@
-export const authorsSales = [
+export const authorssales = [
     {
       name: 'Wilfredo Guardado',
       sales_income: '1000',

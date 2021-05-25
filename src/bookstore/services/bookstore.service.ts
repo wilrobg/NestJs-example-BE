@@ -1,11 +1,18 @@
-import { Injectable } from '@nestjs/common';
-//import { authorsSales } from '../mocks/authorsSales.mock';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { SaleItem } from '../entities/saleitem.entity';
+import { authorssales } from '../mocks/authorssales.mock';
+import { SaleItemRepository } from '../repositories/saleitem.repository';
 
 @Injectable()
 export class BookstoreService {
-    private sales = authorsSales;
+    constructor(private readonly saleItemRepository: SaleItemRepository) {}
+    private sales = authorssales;
 
-    public async getTopAuthorSales10() {
-        return this.sales;
+    public async getTopAuthorSales10(name: string) : Promise<SaleItem[]> {
+        var authors = await this.saleItemRepository.getTopAuthorSales(name);
+        if (!authors.length) {
+            throw new NotFoundException(`No authors found with name ${name}`);
+          }
+        return authors;
     }
 }
