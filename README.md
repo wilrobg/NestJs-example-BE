@@ -62,11 +62,54 @@ $ npm run test:cov
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Solution
+
+### Part1: SQL
+```PLpgSQL
+--Who are the first 10 authors ordered by date_of_birth?
+select * from author order by date_of_birth limit 10;
+```
+```PLpgSQL
+--What is the sales total for the author named “Lorelai Gilmore”?
+select
+  sum(quantity * item_price) sale
+from
+  sale_item s
+  inner join book b on b.id = s.book_id
+  inner join author a on a.id = b.author_id
+where
+  a.name ilike 'Lorelai Gilmore';
+```
+```PLpgSQL
+--What are the top 10 performing authors, ranked by sales revenue?	
+select
+  a.name,
+  sum(quantity * item_price) sale
+from
+  sale_item s
+  inner join book b on b.id = s.book_id
+  inner join author a on a.id = b.author_id
+group by
+  a.name
+order by
+  sale desc
+LIMIT
+  10;
+```
+
+### Part2: Basic API Endpoint
+After configurate the .env file, hit the follow endpoint:
+```
+/bookstore?name=Maya%20Schamberger
+```
+***name*** parameter is optional
+
+### Part3: API Performance
+
+A layer was added to improve performances, it acts as a temporary data store providing high performance data access. For this API use ***built-in one***, an in-memory data store.
+
+### Part4: Build Docker Container and steps to deploy
 
 ## License
 
