@@ -8,11 +8,12 @@ export class BookstoreService {
     constructor(private readonly saleItemRepository: SaleItemRepository) {}
     private sales = authorssales;
 
-    public async getTopAuthorSales10(name: string) : Promise<SaleItem[]> {
-        var authors = await this.saleItemRepository.getTopAuthorSales(name);
+    public async getTopAuthorSales10(name?: string) : Promise<SaleItem[]> {
+        console.log(name);
+        const authors = await this.saleItemRepository.getTopAuthorSales(name);
         if (!authors.length) {
             throw new NotFoundException(`No authors found with name ${name}`);
-          }
+        }
         return authors;
     }
 }

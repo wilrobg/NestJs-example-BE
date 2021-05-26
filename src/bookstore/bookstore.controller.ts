@@ -1,13 +1,15 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { get } from 'http';
 import { BookstoreService } from './services/bookstore.service';
+import { RequestDto } from "./dto/requestDto.dto";
 
 @Controller('bookstore')
 export class BookstoreController {
     constructor(private readonly bookstoreService : BookstoreService){
     }
 
-    @Get(':name')
-    async getTopAuthorSalesAsync(@Param('name') name: string){
-        return this.bookstoreService.getTopAuthorSales10(name);
+    @Get()
+    async getTopAuthorSalesAsync(@Query() request: RequestDto){
+        return this.bookstoreService.getTopAuthorSales10(request.name);
     }
 }
