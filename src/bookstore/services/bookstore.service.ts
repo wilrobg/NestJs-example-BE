@@ -10,7 +10,6 @@ export class BookstoreService {
     private sales = authorssales;
 
     public async getTopAuthorSales10(name?: string) : Promise<ResponseDto[]> {
-        console.log(name);
         const sales = await this.saleItemRepository.getTopAuthorSales(name);
         if (!sales.length) {
             throw new NotFoundException(`No authors found with name ${name}`);

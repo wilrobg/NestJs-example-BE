@@ -1,0 +1,24 @@
+version: '3'
+services:
+  db:
+    image: postgres:11
+    environment:
+      POSTGRES_USER: '${TYPEORM_USERNAME}'
+      POSTGRES_PASSWORD: '${TYPEORM_PASSWORD}'
+      POSTGRES_DB: '${TYPEORM_DATABASE}'
+    ports:
+      - '5438:5432'
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+  api:
+    build: .
+    command: npm run start:dev
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+
+volumes:
+  pg-data:
