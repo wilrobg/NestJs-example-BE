@@ -1,18 +1,20 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { SaleItem } from '../entities/saleitem.entity';
+import { ResponseDto } from '../dto/responseDto.dto';
 
 @EntityRepository(SaleItem)
 export class SaleItemRepository extends Repository<SaleItem> {
 
-    async getTopAuthorSales(name?: string): Promise<SaleItem[]>{
+    async getTopAuthorSales(name?: string): Promise<ResponseDto[]>{
 
-        console.log(name);
         const salesQuery = this.createQueryBuilder('saleItem')
+        .select('SUM(saleItem.item_price * saleItem.quantity)', 'total_sale')
+        .addSelect('author.name','author_name')
         .innerJoin('saleItem.book', 'book')
         .innerJoin('book.author', 'author')
+        .groupBy('author.id')
         .limit(10);
 
-        console.log(salesQuery.getQuery());
         if (name) {
             salesQuery.andWhere('name ilike :name', { name: `%${name}%` });
         }
