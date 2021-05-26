@@ -111,6 +111,85 @@ A layer was added to improve performances, it acts as a temporary data store pro
 
 ### Part4: Build Docker Container and steps to deploy
 
+Creating a Dockerfile:
+```bash
+FROM node:12.19.0-alpine3.9 AS development
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install glob rimraf
+
+RUN npm install --only=development
+
+COPY . .
+
+RUN npm run build
+
+FROM node:12.19.0-alpine3.9 as production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install --only=production
+
+COPY . .
+
+COPY --from=development /usr/src/app/dist ./dist
+
+CMD ["node", "dist/main"]
+```
+
+### Build Docker image
+The first step to deploying the application to Kubernetes is to build a Docker images. 
+Build and tag the Docker image for the app:
+```bash
+docker build -t ravn_challenge .
+```
+
+then upload image to Docker Hub
+```bash
+docker push <username>/ravn-be-challenge:1.0.0
+```
+
+### Deploying the sample app to GKE
+We are ready to to deploy the Docker image you built to your GKE cluster.
+```bash
+kubectl create deployment ravn-be-challenge --image=<username>/ravn-be-challenge:1.0.0
+```
+
+Set the baseline number of Deployment replicas to 3.
+```bash
+kubectl scale deployment ravn-be-challenge --replicas=3
+```
+
+Create a HorizontalPodAutoscaler resource for the api Deployment
+```bash
+kubectl autoscale deployment ravn-be-challenge --cpu-percent=80 --min=1 --max=5
+```
+
+To see the Pods created, run the following command:
+```bash
+kubectl get pods
+```
+
+Use the kubectl expose command to generate a Kubernetes Service for the ravn-be-challenge deployment
+```bash
+kubectl expose deployment ravn-be-challenge --name=ravn-be-challenge-service --type=LoadBalancer --port 80 --target-port 8080
+```
+Here, the --port flag specifies the port number configured on the Load Balancer, and the --target-port flag specifies the port number that the ravn-be-challenge container is listening on.
+
+Run the following command to get the Service details for ravn-be-challenge-service:
+```bash
+kubectl get service
+```
+You get the external ip, to look up for the service
+
 ## License
 
 Nest is [MIT licensed](LICENSE).
